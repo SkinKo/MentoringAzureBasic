@@ -108,16 +108,18 @@ namespace ProductRestAPI.Repository
                            new
                            {
                                id = product.Id,
-                               personType = product.PersonType,
-                               nameStyle = product.NameStyle,
-                               title = product.Title,
-                               firstName = product.FirstName,
-                               middleName = product.MiddleName,
-                               lastName = product.LastName,
-                               suffix = product.Suffix,
-                               emailPromotion = product.EmailPromotion,
-                               additionalContactInfo = product.AdditionalContactInfo,
-                               demographics = product.Demographics
+                               name = product.Name,
+                               productNumber = product.ProductNumber,
+                               color = product.Color,
+                               standardCost = product.StandardCost,
+                               listPrice = product.ListPrice,
+                               size = product.Size,
+                               weight = product.Weight,
+                               productCategoryID = product.ProductCategoryID,
+                               productModelID = product.ProductModelID,
+                               sellStartDate = product.SellStartDate,
+                               sellEndDate = product.SellEndDate,
+                               discontinuedDate = product.DiscontinuedDate
                            }, commandType: CommandType.Text) > 0;
             }
         }
@@ -145,16 +147,18 @@ where ProductID = @id",
                            new
                            {
                                id = product.Id,
-                               personType = product.PersonType,
-                               nameStyle = product.NameStyle,
-                               title = product.Title,
-                               firstName = product.FirstName,
-                               middleName = product.MiddleName,
-                               lastName = product.LastName,
-                               suffix = product.Suffix,
-                               emailPromotion = product.EmailPromotion,
-                               additionalContactInfo = product.AdditionalContactInfo,
-                               demographics = product.Demographics
+                               name = product.Name,
+                               productNumber = product.ProductNumber,
+                               color = product.Color,
+                               standardCost = product.StandardCost,
+                               listPrice = product.ListPrice,
+                               size = product.Size,
+                               weight = product.Weight,
+                               productCategoryID = product.ProductCategoryID,
+                               productModelID = product.ProductModelID,
+                               sellStartDate = product.SellStartDate,
+                               sellEndDate = product.SellEndDate,
+                               discontinuedDate = product.DiscontinuedDate
                            }, commandType: CommandType.Text) > 0;
             }
         }

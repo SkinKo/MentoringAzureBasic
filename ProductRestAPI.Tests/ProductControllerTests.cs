@@ -17,11 +17,11 @@ namespace Tests
             _repository = new Mock<IProductsRepository>();
             _repository.Setup(x => x.Get()).Returns(new List<ProductRestAPI.Models.Product>
             {
-                new ProductRestAPI.Models.Product { Id = 1, FirstName = "First Product" },
-                new ProductRestAPI.Models.Product { Id = 2, FirstName = "Second Product" },
-                new ProductRestAPI.Models.Product { Id = 3, FirstName = "Last Product" },
+                new ProductRestAPI.Models.Product { Id = 1, Name = "First Product" },
+                new ProductRestAPI.Models.Product { Id = 2, Name = "Second Product" },
+                new ProductRestAPI.Models.Product { Id = 3, Name = "Last Product" },
             });
-            _repository.Setup(x => x.Get(2)).Returns(new ProductRestAPI.Models.Product { Id = 2, FirstName = "Second Product" });
+            _repository.Setup(x => x.Get(2)).Returns(new ProductRestAPI.Models.Product { Id = 2, Name = "Second Product" });
 
             _controller = new ProductRestAPI.Controllers.ProductsController(_repository.Object);
         }
@@ -39,7 +39,7 @@ namespace Tests
         {
             var product = _controller.Get(2).Value;
 
-            Assert.AreEqual(product.FirstName, "Second Product");
+            Assert.AreEqual(product.Name, "Second Product");
         }
 
         [Test]
