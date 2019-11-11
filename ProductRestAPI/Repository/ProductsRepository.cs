@@ -31,18 +31,20 @@ namespace ProductRestAPI.Repository
                 SqlConnection con = new SqlConnection(_connectionString))
             {
                 return con.Query<Product>(@"select 
-                BusinessEntityID as Id,
-                PersonType,
-                NameStyle,
-                Title,
-                FirstName,
-                MiddleName,
-                LastName,
-                Suffix,
-                EmailPromotion,
-                AdditionalContactInfo,
-                Demographics
-                    from Person.Person", commandType: CommandType.Text);
+                ProductID as Id,
+                Name,
+                ProductNumber,
+                Color,
+                StandardCost,
+                ListPrice,
+                Size,
+                Weight,
+                ProductCategoryID,
+                ProductModelID,
+                SellStartDate,
+                SellEndDate,
+                DiscontinuedDate
+                    from SalesLT.Product", commandType: CommandType.Text);
             }
         }
 
@@ -52,18 +54,20 @@ namespace ProductRestAPI.Repository
                 SqlConnection con = new SqlConnection(_connectionString))
             {
                 return con.QueryFirstOrDefault<Product>(@"select 
-                BusinessEntityID as Id,
-                PersonType,
-                NameStyle,
-                Title,
-                FirstName,
-                MiddleName,
-                LastName,
-                Suffix,
-                EmailPromotion,
-                AdditionalContactInfo,
-                Demographics
-                    from Person.Person where BusinessEntityID = @id", new { id }, commandType: CommandType.Text);
+                ProductID as Id,
+                Name,
+                ProductNumber,
+                Color,
+                StandardCost,
+                ListPrice,
+                Size,
+                Weight,
+                ProductCategoryID,
+                ProductModelID,
+                SellStartDate,
+                SellEndDate,
+                DiscontinuedDate
+                    from SalesLT.Product where ProductID = @id", new { id }, commandType: CommandType.Text);
             }
         }
 
@@ -72,30 +76,34 @@ namespace ProductRestAPI.Repository
             using (
                 SqlConnection con = new SqlConnection(_connectionString))
             {
-                return con.Execute(@"insert into Person.Person (
-                                                        BusinessEntityID, 
-                                                        PersonType, 
-                                                        NameStyle, 
-                                                        Title, 
-                                                        FirstName, 
-                                                        MiddleName, 
-                                                        LastName, 
-                                                        Suffix, 
-                                                        EmailPromotion, 
-                                                        AdditionalContactInfo, 
-                                                        Demographics, 
+                return con.Execute(@"insert into SalesLT.Product (
+                                                        ProductID,
+                                                        Name,
+                                                        ProductNumber,
+                                                        Color,
+                                                        StandardCost,
+                                                        ListPrice,
+                                                        Size,
+                                                        Weight,
+                                                        ProductCategoryID,
+                                                        ProductModelID,
+                                                        SellStartDate,
+                                                        SellEndDate,
+                                                        DiscontinuedDate 
                                                         ModifiedDate)
                                         values (@id, 
-                                                @personType, 
-                                                @nameStyle, 
-                                                @title, 
-                                                @firstName, 
-                                                @middleName, 
-                                                @lastName, 
-                                                @suffix, 
-                                                @emailPromotion, 
-                                                @additionalContactInfo, 
-                                                @demographics, 
+                                                @name, 
+                                                @productNumber, 
+                                                @color, 
+                                                @standardCost, 
+                                                @listPrice, 
+                                                @size, 
+                                                @weight, 
+                                                @productCategoryID, 
+                                                @productModelID, 
+                                                @sellStartDate, 
+                                                @sellEndDate, 
+                                                @discontinuedDate,  
                                                 GETDATE())",
                            new
                            {
@@ -119,19 +127,21 @@ namespace ProductRestAPI.Repository
             using (
     SqlConnection con = new SqlConnection(_connectionString))
             {
-                return con.Execute(@"update Person.Person 
-set PersonType = @personType, 
-    NameStyle = @nameStyle, 
-    Title = @title, 
-    FirstName = @firstName, 
-    MiddleName = @middleName, 
-    LastName = @lastName, 
-    Suffix = @suffix, 
-    EmailPromotion = @emailPromotion, 
-    AdditionalContactInfo = @additionalContactInfo, 
-    Demographics = @demographics, 
+                return con.Execute(@"update SalesLT.Product
+set Name = @name, 
+    ProductNumber = @productNumber, 
+    Color = @color, 
+    StandardCost = @standardCost, 
+    ListPrice = @listPrice, 
+    Size = @size, 
+    Weight = @weight, 
+    ProductCategoryID = @productCategoryID, 
+    ProductModelID = @productModelID, 
+    SellStartDate = @sellStartDate, 
+    SellEndDate = @sellEndDate, 
+    DiscontinuedDate = @discontinuedDate, 
     ModifiedDate = GETDATE()
-where BusinessEntityID = @id",
+where ProductID = @id",
                            new
                            {
                                id = product.Id,
@@ -154,8 +164,8 @@ where BusinessEntityID = @id",
             using (
                 SqlConnection con = new SqlConnection(_connectionString))
             {
-                return con.Execute(@"delete from Person.Person 
-                                        where BusinessEntityID = @id",
+                return con.Execute(@"delete from SalesLT.Product 
+                                        where ProductID = @id",
                            new { id }, commandType: CommandType.Text) > 0;
             }
         }
