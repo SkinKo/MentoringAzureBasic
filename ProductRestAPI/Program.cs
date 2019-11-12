@@ -17,20 +17,13 @@ namespace ProductRestAPI
     {
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .Enrich
-                .WithExceptionDetails()
-                .MinimumLevel.Error()
-                .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
-                .CreateLogger();
-
             CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseSerilog()
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration));
     }
 }
 

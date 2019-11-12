@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
+using Serilog;
 
 namespace ProductRestAPI.Repository
 {
@@ -19,10 +20,12 @@ namespace ProductRestAPI.Repository
     public class ProductsRepository : IProductsRepository
     {
         private readonly string _connectionString;
+        private readonly ILogger _logger;
 
-        public ProductsRepository(string connectionString)
+        public ProductsRepository(string connectionString, ILogger logger)
         {
             _connectionString = connectionString;
+            _logger = logger;
         }
 
         public IEnumerable<Product> Get()

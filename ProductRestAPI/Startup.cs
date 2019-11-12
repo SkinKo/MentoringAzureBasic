@@ -23,7 +23,7 @@ namespace ProductRestAPI
         {
             var connectionString = Configuration["Data:ConnectionString"];
 
-            services.AddSingleton<IProductsRepository, ProductsRepository>(serviceProvider => new ProductsRepository(connectionString));
+            services.AddSingleton<IProductsRepository, ProductsRepository>(serviceProvider => new ProductsRepository(connectionString, Serilog.Log.Logger));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSwaggerGen(c =>
             {
