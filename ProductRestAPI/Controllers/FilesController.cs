@@ -1,0 +1,77 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace ProductRestAPI.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class FilesController : ControllerBase
+    {
+        private IConfiguration _configuration;
+
+        public FilesController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        [HttpPost]
+        public async Task Upload(IFormFile file)
+        {
+            var connectionString = _configuration["Data:AzureStorageConnectionString"];
+
+            if (file.Length > 0)
+            {
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
+
+                var blobCient = storageAccount.CreateCloudBlobClient();
+                var queueClient = storageAccount.CreateCloudQueueClient();
+
+                var blobContainer = blobCient.GetContainerReference("uploadfiles");
+                await blobContainer.CreateIfNotExistsAsync();
+
+                var blobName = file.FileName + DateTime.Now.Ticks;
+                var blob = blobContainer.GetBlockBlobReference(blobName);
+
+                var queue = queueClient.GetQueueReference("uploadfiles");
+                await queue.CreateIfNotExistsAsync();
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    await blob.UploadFromStreamAsync(stream, file.Length);
+
+                    var message = new FileUploadMessage();
+                    message.FileName = file.FileName;
+                    message.BlobName = blobName;
+                    message.Metadata = new Dictionary<string, string>();
+
+                    foreach (var header in file.Headers)
+                        message.Metadata.Add(header.Key, header.Value);
+
+                    var json = JsonConvert.SerializeObject(message, Formatting.Indented);
+
+                    CloudQueueMessage queueMessage = new CloudQueueMessage(json);
+                    await queue.AddMessageAsync(queueMessage);
+                }
+            }
+        }
+
+        [Serializable]
+        public class FileUploadMessage
+        {
+            public string FileName { get; set; }
+            public string BlobName { get; set; }
+            public Dictionary<string, string> Metadata { get; set; }
+        }
+    }
+}
