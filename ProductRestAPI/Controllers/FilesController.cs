@@ -6,7 +6,6 @@ using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace ProductRestAPI.Controllers
@@ -15,7 +14,7 @@ namespace ProductRestAPI.Controllers
     [ApiController]
     public class FilesController : ControllerBase
     {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         public FilesController(IConfiguration configuration)
         {
@@ -43,26 +42,29 @@ namespace ProductRestAPI.Controllers
                 var queue = queueClient.GetQueueReference("uploadfiles");
                 await queue.CreateIfNotExistsAsync();
 
-                using (var stream = new MemoryStream())
+                using (var stream = file.OpenReadStream())
                 {
-                    await file.CopyToAsync(stream);
-                    stream.Position = 0;
-
                     await blob.UploadFromStreamAsync(stream, file.Length);
-
-                    var message = new FileUploadMessage();
-                    message.FileName = file.FileName;
-                    message.BlobName = blobName;
-                    message.Metadata = new Dictionary<string, string>();
-
-                    foreach (var header in file.Headers)
-                        message.Metadata.Add(header.Key, header.Value);
-
-                    var json = JsonConvert.SerializeObject(message, Formatting.Indented);
-
-                    CloudQueueMessage queueMessage = new CloudQueueMessage(json);
-                    await queue.AddMessageAsync(queueMessage);
+                    blob.Properties.ContentType = file.ContentType;
                 }
+
+                var message = new FileUploadMessage
+                {
+                    FileName = file.FileName,
+                    BlobName = blobName,
+                    Metadata = new Dictionary<string, string>()
+                };
+
+                foreach (var header in file.Headers)
+                {
+                    message.Metadata.Add(header.Key, header.Value);
+                }
+
+                var json = JsonConvert.SerializeObject(message, Formatting.Indented);
+
+                CloudQueueMessage queueMessage = new CloudQueueMessage(json);
+
+                await queue.AddMessageAsync(queueMessage);
             }
         }
 
