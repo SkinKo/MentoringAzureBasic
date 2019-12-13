@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Common2;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -64,16 +65,8 @@ namespace ProductRestAPI.Controllers
 
                 CloudQueueMessage queueMessage = new CloudQueueMessage(json);
 
-                await queue.AddMessageAsync(queueMessage);
+                await queue.AddMessageAsync(queueMessage, new TimeSpan(1, 0, 0), TimeSpan.Zero, new QueueRequestOptions(), new OperationContext());
             }
-        }
-
-        [Serializable]
-        public class FileUploadMessage
-        {
-            public string FileName { get; set; }
-            public string BlobName { get; set; }
-            public Dictionary<string, string> Metadata { get; set; }
         }
     }
 }
