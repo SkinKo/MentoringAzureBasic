@@ -11,7 +11,7 @@ namespace SQLUpload
     public static class Function1
     {
         [FunctionName("Function1")]
-        public static void Run([QueueTrigger("uploadfiles", Connection = "AzureQueue")]FileUploadMessage message,
+        public static async void Run([QueueTrigger("uploadfiles", Connection = "AzureQueue")]FileUploadMessage message,
             [Blob("uploadfiles/{BlobName}", FileAccess.Read)]Stream file, TraceWriter log, ExecutionContext context)
         {
             log.Info($"C# Queue trigger function processed: {message.FileName}");
@@ -21,7 +21,7 @@ namespace SQLUpload
             if (file != null)
             {
                 byte[] fileContent = new byte[file.Length];
-                file.ReadAsync(fileContent, 0, (int)file.Length).Wait();
+                await file.ReadAsync(fileContent, 0, (int)file.Length);
 
                 FileRepository repository = new FileRepository(connectionString);
                 repository.AddFile(message.FileName, message.Metadata, fileContent);
