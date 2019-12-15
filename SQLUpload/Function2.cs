@@ -1,3 +1,5 @@
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
@@ -13,9 +15,15 @@ namespace SQLUpload
 {
     public static class Function2
     {
+        private static string GetKeyVaultEndpoint() => "https://keyvaultsk1985.vault.azure.net/";
+
         [FunctionName("Function2")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, TraceWriter log)
         {
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            var connectionString = (await keyVaultClient.GetSecretAsync(GetKeyVaultEndpoint(), "AdventureWorksConnectionString")).Value;
+
             log.Info("C# HTTP trigger function processed a request.");
 
             // parse query parameter
@@ -28,7 +36,6 @@ namespace SQLUpload
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Please pass a fileName, id or guid on the query string");
             }
 
-            var connectionString = Environment.GetEnvironmentVariable("AdventureWorksConnectionString", EnvironmentVariableTarget.Process);
             FileRepository repository = new FileRepository(connectionString);
             var fileInfo = repository.GetFile(name, nodeId, guid);
 
