@@ -10,6 +10,13 @@ using Dapper;
 
 namespace SQLUpload
 {
+    public class FileData
+    {
+        public byte[] File { get; set; }
+        public string FileName { get; set; }
+        public string Extension { get; set; }
+    }
+
     public class FileRepository
     {
         private readonly string _connectionString;
@@ -55,6 +62,20 @@ values(
     @document)";
 
                 connection.Execute(sql, new { document = file, filename = fileName, extention = new FileInfo(fileName).Extension });
+            }
+        }
+
+        public FileData GetFile(string name, string nodeId, string guid)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                var sql = @"select Document as [File], FileName, FileExtension as Extension from Production.Document
+where 
+	(DocumentNode = @documentNode or @documentNode is null)
+and (FileName = @fileName or @fileName is null)
+and (rowguid = @guid or @guid is null)";
+
+                return connection.QueryFirstOrDefault<FileData>(sql, new { documentNode = nodeId, fileName = name, guid });
             }
         }
     }
