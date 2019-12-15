@@ -25,7 +25,7 @@ namespace ProductRestAPI.Controllers
         [HttpPost]
         public async Task Upload(IFormFile file)
         {
-            var connectionString = _configuration["Data:AzureStorageConnectionString"];
+            var connectionString = _configuration["AzureStorageConnectionString"];
 
             if (file.Length > 0)
             {
